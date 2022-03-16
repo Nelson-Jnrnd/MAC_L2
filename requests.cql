@@ -1,8 +1,12 @@
 // Requête 1
-match ()-[:ACTED_]-
+MATCH (p1:Person {healthstatus:"Sick"})-[visit1:VISITS]->(:Place)<-[visit2:VISITS]-(p2:Person {healthstatus:"Healthy"})
+WHERE visit1.starttime > p1.confirmedtime AND visit2.starttime > p1.confirmedtime
+RETURN p1.name
 
 // Requête 2
-match ()-[:ACTED_]-
+MATCH (p1:Person {healthstatus:"Sick"})-[visit1:VISITS]->(:Place)<-[visit2:VISITS]-(p2:Person {healthstatus:"Healthy"})
+WHERE visit1.starttime > p1.confirmedtime AND visit2.starttime > p1.confirmedtime
+RETURN p1.name, COUNT(p2) AS nbHealthy
 
 // Requête 3
 match ()-[:ACTED_]-
