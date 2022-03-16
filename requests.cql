@@ -1,30 +1,30 @@
-// Requête 1
+// Requête 1 - possibleSpreaders
 MATCH (p1:Person {healthstatus:"Sick"})-[visit1:VISITS]->(:Place)<-[visit2:VISITS]-(p2:Person {healthstatus:"Healthy"})
 WHERE visit1.starttime > p1.confirmedtime AND visit2.starttime > p1.confirmedtime
 RETURN p1.name
 
-// Requête 2
+// Requête 2 - possibleSpreadCounts
 MATCH (p1:Person {healthstatus:"Sick"})-[visit1:VISITS]->(:Place)<-[visit2:VISITS]-(p2:Person {healthstatus:"Healthy"})
 WHERE visit1.starttime > p1.confirmedtime AND visit2.starttime > p1.confirmedtime
 RETURN p1.name, COUNT(p2) AS nbHealthy
 
-// Requête 3
+// Requête 3 - carelessPeople
+
+
+// Requête 4 - sociallyCareful
 match ()-[:ACTED_]-
 
-// Requête 4
+// Requête 5 - peopleToInform
 match ()-[:ACTED_]-
 
-// Requête 5
+// Requête 6 - setHighRisk
 match ()-[:ACTED_]-
 
-// Requête 6
+// Requête 7 - healthyCompanionsOf
 match ()-[:ACTED_]-
 
-// Requête 7
+// Requête 8 - topSickSite
 match ()-[:ACTED_]-
 
-// Requête 8
-match ()-[:ACTED_]-
-
-// Requête 9
+// Requête 9 - sickFrom
 match ()-[:ACTED_]-
