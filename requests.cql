@@ -9,7 +9,10 @@ WHERE visit1.starttime > p1.confirmedtime AND visit2.starttime > p1.confirmedtim
 RETURN p1.name, COUNT(p2) AS nbHealthy
 
 // Requête 3 - carelessPeople
-
+MATCH (person:Person {healthstatus:"Sick"})-[:VISITS]->(place:Place)
+WITH person, count(place.name) AS nbPlaces
+WHERE nbPlaces > 10
+RETURN person.name AS sickName, nbPlaces ORDER BY nbPlaces DESC
 
 // Requête 4 - sociallyCareful
 match ()-[:ACTED_]-
