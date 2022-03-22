@@ -26,10 +26,10 @@ match ()-[:ACTED_]-
 match ()-[:ACTED_]-
 
 // Requête 7 - healthyCompanionsOf
-match ()-[:ACTED_]-
+MATCH (n:Person{name:"Payton Kent"})-[:VISITS*1..3]-(v:Person{healthstatus:"Healthy}) RETURN v
 
 // Requête 8 - topSickSite
-match ()-[:ACTED_]-
+MATCH (p:Place)-[:VISITS]-(s:Person{healthstatus:"Sick"}) RETURN p.type AS placeType, size(collect(s)) AS nbOfSickVisits ORDER BY nbOfSickVisits DESC LIMIT 1
 
 // Requête 9 - sickFrom
-match ()-[:ACTED_]-
+MATCH (n:Person {healthstatus:"Sick"}) RETURN n
