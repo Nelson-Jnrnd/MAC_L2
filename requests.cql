@@ -1,12 +1,12 @@
 // Requête 1 - possibleSpreaders
 MATCH (p1:Person {healthstatus:"Sick"})-[visit1:VISITS]->(:Place)<-[visit2:VISITS]-(p2:Person {healthstatus:"Healthy"})
 WHERE visit1.starttime > p1.confirmedtime AND visit2.starttime > p1.confirmedtime
-RETURN DISTINCT p1.name as sickName
+RETURN DISTINCT p1.name AS sickName
 
 // Requête 2 - possibleSpreadCounts
 MATCH (p1:Person {healthstatus:"Sick"})-[visit1:VISITS]->(:Place)<-[visit2:VISITS]-(p2:Person {healthstatus:"Healthy"})
 WHERE visit1.starttime > p1.confirmedtime AND visit2.starttime > p1.confirmedtime
-RETURN p1.name, COUNT(p2) AS nbHealthy
+RETURN p1.name AS sickName, COUNT(p2) AS nbHealthy
 
 // Requête 3 - carelessPeople
 MATCH (person:Person {healthstatus:"Sick"})-[:VISITS]->(place:Place)
