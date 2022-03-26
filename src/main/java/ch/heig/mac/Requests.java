@@ -12,6 +12,13 @@ public class Requests {
     private static final Logger LOGGER = Logger.getLogger(Requests.class.getName());
     private final Driver driver;
 
+    private List<Record> runStandardQuery(String query) {
+        try (Session session = driver.session()) {
+            Result result = session.run(query);
+            return result.list();
+        }
+    }
+
     public Requests(Driver driver) {
         this.driver = driver;
     }
@@ -30,14 +37,15 @@ public class Requests {
                 "WHERE visit1.starttime > p1.confirmedtime AND visit2.starttime > p1.confirmedtime\n" +
                 "RETURN DISTINCT p1.name as sickName";
 
-        try (Session session = driver.session()) {
-            Result result = session.run(query);
-            return result.list();
-        }
+        return runStandardQuery(query);
     }
 
     public List<Record> possibleSpreadCounts() {
-        throw new UnsupportedOperationException("Not implemented, yet");
+        String query = "MATCH (p1:Person {healthstatus:\"Sick\"})-[visit1:VISITS]->(:Place)<-[visit2:VISITS]-(p2:Person {healthstatus:\"Healthy\"})\n" +
+        "WHERE visit1.starttime > p1.confirmedtime AND visit2.starttime > p1.confirmedtime\n" +
+        "RETURN p1.name as sickName, COUNT(p2) AS nbHealthy";
+
+        return runStandardQuery(query);
     }
 
     public List<Record> carelessPeople() {
