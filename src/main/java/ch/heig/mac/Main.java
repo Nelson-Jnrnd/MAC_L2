@@ -10,7 +10,7 @@ public class Main {
     public static Driver openConnection() {
         var uri = "neo4j://localhost:7687";
         var username = "neo4j";
-        var password = "";
+        var password = "neo4j";
         var config = Config.defaultConfig();
 
         return GraphDatabase.driver(uri, AuthTokens.basic(username, password), config);
