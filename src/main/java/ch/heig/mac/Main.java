@@ -2,8 +2,6 @@ package ch.heig.mac;
 
 import org.neo4j.driver.*;
 
-import java.util.List;
-
 public class Main {
 
     // TODO: Configure credentials to allow connection to your Neo4j instance
