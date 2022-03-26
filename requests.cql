@@ -17,7 +17,7 @@ RETURN person.name AS sickName, nbPlaces ORDER BY nbPlaces DESC
 // Requête 4 - sociallyCareful
 MATCH (person:Person {healthstatus:"Sick"})-[visit:VISITS]-(place:Place {type:"Bar"})
 WHERE all(_ in [person.confirmedtime, visit.starttime] WHERE visit.starttime < person.confirmedtime)
-RETURN DISTINCT(person.name) as sickName
+RETURN DISTINCT(person.name) AS sickName
 
 // Requête 5 - peopleToInform
 match ()-[:ACTED_]-
@@ -26,10 +26,13 @@ match ()-[:ACTED_]-
 match ()-[:ACTED_]-
 
 // Requête 7 - healthyCompanionsOf
-MATCH (n:Person{name:"Payton Kent"})-[:VISITS*1..3]-(v:Person{healthstatus:"Healthy"}) RETURN v
+MATCH (n:Person{name:"Payton Kent"})-[:VISITS*1..3]-(v:Person{healthstatus:"Healthy"})
+RETURN v as healthyName
 
 // Requête 8 - topSickSite
-MATCH (p:Place)-[:VISITS]-(s:Person{healthstatus:"Sick"}) RETURN p.type AS placeType, size(collect(s)) AS nbOfSickVisits ORDER BY nbOfSickVisits DESC LIMIT 1
+MATCH (p:Place)-[:VISITS]-(s:Person{healthstatus:"Sick"})
+RETURN p.type AS placeType, size(collect(s)) AS nbOfSickVisits ORDER BY nbOfSickVisits DESC LIMIT 1
 
 // Requête 9 - sickFrom
-MATCH (n:Person {healthstatus:"Sick"}) RETURN n
+MATCH (n:Person {healthstatus:"Sick"})
+RETURN n AS sickName
