@@ -1,20 +1,27 @@
 package ch.heig.mac;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
-import org.neo4j.driver.exceptions.Neo4jException;
 
 public class Requests {
     private static final Logger LOGGER = Logger.getLogger(Requests.class.getName());
     private final Driver driver;
 
-    private List<Record> runStandardQuery(String query) {
+    private List<Record> fetchRecordsFromQuery(String query) {
         try (Session session = driver.session()) {
             Result result = session.run(query);
+            return result.list();
+        }
+    }
+
+    private List<Record> fetchRecordsFromParameterizedQuery(String query, Map<String, Object> parameters) {
+        try (Session session = driver.session()) {
+            Result result = session.run(query, parameters);
             return result.list();
         }
     }
@@ -37,15 +44,15 @@ public class Requests {
                 "WHERE visit1.starttime > p1.confirmedtime AND visit2.starttime > p1.confirmedtime\n" +
                 "RETURN DISTINCT p1.name as sickName";
 
-        return runStandardQuery(query);
+        return fetchRecordsFromQuery(query);
     }
 
     public List<Record> possibleSpreadCounts() {
         String query = "MATCH (p1:Person {healthstatus:\"Sick\"})-[visit1:VISITS]->(:Place)<-[visit2:VISITS]-(p2:Person {healthstatus:\"Healthy\"})\n" +
-        "WHERE visit1.starttime > p1.confirmedtime AND visit2.starttime > p1.confirmedtime\n" +
-        "RETURN p1.name as sickName, COUNT(p2) AS nbHealthy";
+                "WHERE visit1.starttime > p1.confirmedtime AND visit2.starttime > p1.confirmedtime\n" +
+                "RETURN p1.name as sickName, COUNT(p2) AS nbHealthy";
 
-        return runStandardQuery(query);
+        return fetchRecordsFromQuery(query);
     }
 
     public List<Record> carelessPeople() {
@@ -54,7 +61,7 @@ public class Requests {
                 "WHERE nbPlaces > 10\n" +
                 "RETURN person.name AS sickName, nbPlaces ORDER BY nbPlaces DESC";
 
-        return runStandardQuery(query);
+        return fetchRecordsFromQuery(query);
     }
 
     public List<Record> sociallyCareful() {
@@ -62,7 +69,7 @@ public class Requests {
                 "WHERE all(_ in [person.confirmedtime, visit.starttime] WHERE visit.starttime < person.confirmedtime)\n" +
                 "RETURN DISTINCT(person.name) as sickName";
 
-        return runStandardQuery(query);
+        return fetchRecordsFromQuery(query);
     }
 
     public List<Record> peopleToInform() {
@@ -74,11 +81,20 @@ public class Requests {
     }
 
     public List<Record> healthyCompanionsOf(String name) {
-        throw new UnsupportedOperationException("Not implemented, yet");
+        String query = "MATCH (n:Person{name:$name})-[:VISITS*1..3]-(v:Person{healthstatus:\"Healthy\"})\n" +
+                "RETURN v.name as healthyName";
+
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put("name", name);
+
+        return fetchRecordsFromParameterizedQuery(query, parameters);
     }
 
     public Record topSickSite() {
-        throw new UnsupportedOperationException("Not implemented, yet");
+        String query = "MATCH (p:Place)-[:VISITS]-(s:Person{healthstatus:\"Sick\"})\n" +
+                "RETURN p.type AS placeType, size(collect(s)) AS nbOfSickVisits ORDER BY nbOfSickVisits DESC LIMIT 1";
+
+        return fetchRecordsFromQuery(query).get(0);
     }
 
     public List<Record> sickFrom(List<String> names) {

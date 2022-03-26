@@ -26,8 +26,8 @@ match ()-[:ACTED_]-
 match ()-[:ACTED_]-
 
 // Requête 7 - healthyCompanionsOf
-MATCH (n:Person{name:"Payton Kent"})-[:VISITS*1..3]-(v:Person{healthstatus:"Healthy"})
-RETURN v as healthyName
+MATCH (n:Person{name:$name})-[:VISITS*1..3]-(v:Person{healthstatus:"Healthy"})
+RETURN v.name AS healthyName
 
 // Requête 8 - topSickSite
 MATCH (p:Place)-[:VISITS]-(s:Person{healthstatus:"Sick"})
