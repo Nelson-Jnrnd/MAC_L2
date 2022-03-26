@@ -17,7 +17,7 @@ RETURN person.name AS sickName, nbPlaces ORDER BY nbPlaces DESC
 // Requête 4 - sociallyCareful
 MATCH (person:Person {healthstatus:"Sick"})-[visit:VISITS]-(place:Place {type:"Bar"})
 WHERE all(_ in [person.confirmedtime, visit.starttime] WHERE visit.starttime < person.confirmedtime)
-RETURN DISTINCT(person.name)
+RETURN DISTINCT(person.name) as sickName
 
 // Requête 5 - peopleToInform
 match ()-[:ACTED_]-

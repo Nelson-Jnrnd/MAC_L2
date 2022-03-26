@@ -49,11 +49,20 @@ public class Requests {
     }
 
     public List<Record> carelessPeople() {
-        throw new UnsupportedOperationException("Not implemented, yet");
+        String query = "MATCH (person:Person {healthstatus:\"Sick\"})-[:VISITS]->(place:Place)\n" +
+                "WITH person, count(place.name) AS nbPlaces\n" +
+                "WHERE nbPlaces > 10\n" +
+                "RETURN person.name AS sickName, nbPlaces ORDER BY nbPlaces DESC";
+
+        return runStandardQuery(query);
     }
 
     public List<Record> sociallyCareful() {
-        throw new UnsupportedOperationException("Not implemented, yet");
+        String query = "MATCH (person:Person {healthstatus:\"Sick\"})-[visit:VISITS]-(place:Place {type:\"Bar\"})\n" +
+                "WHERE all(_ in [person.confirmedtime, visit.starttime] WHERE visit.starttime < person.confirmedtime)\n" +
+                "RETURN DISTINCT(person.name) as sickName";
+
+        return runStandardQuery(query);
     }
 
     public List<Record> peopleToInform() {
