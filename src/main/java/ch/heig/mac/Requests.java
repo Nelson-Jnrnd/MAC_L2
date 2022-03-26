@@ -3,11 +3,13 @@ package ch.heig.mac;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
+import org.neo4j.driver.exceptions.Neo4jException;
 
 public class Requests {
-    private static final  Logger LOGGER = Logger.getLogger(Requests.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Requests.class.getName());
     private final Driver driver;
 
     public Requests(Driver driver) {
@@ -24,7 +26,14 @@ public class Requests {
     }
 
     public List<Record> possibleSpreaders() {
-        throw new UnsupportedOperationException("Not implemented, yet");
+        String query = "MATCH (p1:Person {healthstatus:\"Sick\"})-[visit1:VISITS]->(:Place)<-[visit2:VISITS]-(p2:Person {healthstatus:\"Healthy\"})\n" +
+                "WHERE visit1.starttime > p1.confirmedtime AND visit2.starttime > p1.confirmedtime\n" +
+                "RETURN DISTINCT p1.name as sickName";
+
+        try (Session session = driver.session()) {
+            Result result = session.run(query);
+            return result.list();
+        }
     }
 
     public List<Record> possibleSpreadCounts() {
