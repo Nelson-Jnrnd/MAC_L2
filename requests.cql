@@ -19,11 +19,17 @@ MATCH (person:Person {healthstatus:"Sick"})-[visit:VISITS]-(place:Place {type:"B
 WHERE all(_ in [person.confirmedtime, visit.starttime] WHERE visit.starttime < person.confirmedtime)
 RETURN DISTINCT(person.name) AS sickName
 
-// Requête 5 - peopleToInform
-match ()-[:ACTED_]-
+// Requête 5 - peopleToInform :::: Je sais pas si le distinct dans le collect est de trop. Mais mieux vaut trop que pas assez
+MATCH (sick:Person {healthstatus:"Sick"})-[v:VISITS]-(p:Place)-[v2:VISITS]-(potential:Person {healthstatus:"Healthy"})
+WHERE duration.inSeconds(apoc.coll.max([v.starttime, v2.starttime]), apoc.coll.min([v.endtime, v2.endtime])).hours >= 2
+RETURN sick.name AS sickName, collect(DISTINCT (potential.name)) AS peopleToInform
 
-// Requête 6 - setHighRisk
-match ()-[:ACTED_]-
+
+// Requête 6 - setHighRisk ::::::::: C'est pas bon, faudrait que ça retourne tout les high risk même ceux qui ont pas été modifié par cette requête. Aled :'(
+MATCH (sick:Person {healthstatus:"Sick"})-[v:VISITS]-(p:Place)-[v2:VISITS]-(potential:Person {healthstatus:"Healthy"})
+WHERE duration.inSeconds(apoc.coll.max([v.starttime, v2.starttime]), apoc.coll.min([v.endtime, v2.endtime])).hours >= 2
+SET potential.risk = "High"
+RETURN DISTINCT potential.name as highRiskName
 
 // Requête 7 - healthyCompanionsOf
 MATCH (n:Person{name:$name})-[:VISITS*1..3]-(v:Person{healthstatus:"Healthy"})
@@ -35,4 +41,4 @@ RETURN p.type AS placeType, size(collect(s)) AS nbOfSickVisits ORDER BY nbOfSick
 
 // Requête 9 - sickFrom
 MATCH (n:Person {healthstatus:"Sick"})
-RETURN n AS sickName
+RETURN n.name AS sickName
