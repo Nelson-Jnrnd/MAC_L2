@@ -73,11 +73,20 @@ public class Requests {
     }
 
     public List<Record> peopleToInform() {
-        throw new UnsupportedOperationException("Not implemented, yet");
+        String query = "MATCH (sick:Person {healthstatus:\"Sick\"})-[v:VISITS]-(p:Place)-[v2:VISITS]-(potential:Person {healthstatus:\"Healthy\"})\n" +
+                "WHERE duration.inSeconds(apoc.coll.max([v.starttime, v2.starttime]), apoc.coll.min([v.endtime, v2.endtime])).hours >= 2\n" +
+                "RETURN sick.name AS sickName, collect(DISTINCT (potential.name)) AS peopleToInform";
+
+        return fetchRecordsFromQuery(query);
     }
 
     public List<Record> setHighRisk() {
-        throw new UnsupportedOperationException("Not implemented, yet");
+        String query = "MATCH (sick:Person {healthstatus:\"Sick\"})-[v:VISITS]-(p:Place)-[v2:VISITS]-(potential:Person {healthstatus:\"Healthy\"})\n" +
+                "WHERE duration.inSeconds(apoc.coll.max([v.starttime, v2.starttime]), apoc.coll.min([v.endtime, v2.endtime])).hours >= 2\n" +
+                "SET potential.risk = \"High\"\n" +
+                "RETURN DISTINCT potential.name as highRiskName";
+
+        return fetchRecordsFromQuery(query);
     }
 
     public List<Record> healthyCompanionsOf(String name) {
