@@ -84,7 +84,7 @@ public class Requests {
         String query = "MATCH (n:Person{name:$name})-[:VISITS*1..3]-(v:Person{healthstatus:\"Healthy\"})\n" +
                 "RETURN v.name as healthyName";
 
-        HashMap<String, Object> parameters = new HashMap<>();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("name", name);
 
         return fetchRecordsFromParameterizedQuery(query, parameters);
@@ -98,6 +98,13 @@ public class Requests {
     }
 
     public List<Record> sickFrom(List<String> names) {
-        throw new UnsupportedOperationException("Not implemented, yet");
+        String query = "MATCH (n:Person {healthstatus:\"Sick\"})\n" +
+                "where n.name in $names\n" +
+                "RETURN n.name AS sickName";
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("names", names);
+
+        return fetchRecordsFromParameterizedQuery(query, parameters);
     }
 }

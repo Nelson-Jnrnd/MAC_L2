@@ -24,7 +24,6 @@ MATCH (sick:Person {healthstatus:"Sick"})-[v:VISITS]-(p:Place)-[v2:VISITS]-(pote
 WHERE duration.inSeconds(apoc.coll.max([v.starttime, v2.starttime]), apoc.coll.min([v.endtime, v2.endtime])).hours >= 2
 RETURN sick.name AS sickName, collect(DISTINCT (potential.name)) AS peopleToInform
 
-
 // Requête 6 - setHighRisk ::::::::: C'est pas bon, faudrait que ça retourne tout les high risk même ceux qui ont pas été modifié par cette requête. Aled :'(
 MATCH (sick:Person {healthstatus:"Sick"})-[v:VISITS]-(p:Place)-[v2:VISITS]-(potential:Person {healthstatus:"Healthy"})
 WHERE duration.inSeconds(apoc.coll.max([v.starttime, v2.starttime]), apoc.coll.min([v.endtime, v2.endtime])).hours >= 2
@@ -41,4 +40,5 @@ RETURN p.type AS placeType, size(collect(s)) AS nbOfSickVisits ORDER BY nbOfSick
 
 // Requête 9 - sickFrom
 MATCH (n:Person {healthstatus:"Sick"})
+where n.name in $names
 RETURN n.name AS sickName
