@@ -8,9 +8,10 @@ MATCH (p1:Person {healthstatus:"Sick"})-[visit1:VISITS]->(:Place)<-[visit2:VISIT
 WHERE visit1.starttime > p1.confirmedtime AND visit2.starttime > p1.confirmedtime
 RETURN p1.name AS sickName, COUNT(p2) AS nbHealthy
 
-// Requête 3 - carelessPeople
-MATCH (person:Person {healthstatus:"Sick"})-[:VISITS]->(place:Place)
-WITH person, count(place.name) AS nbPlaces
+// Requête 3 - carelessPeople -- TODO update java
+MATCH (person:Person {healthstatus:"Sick"})-[v:VISITS]->(place:Place)
+WHERE person.confirmedtime > v.starttime
+WITH person, count(DISTINCT place.name) AS nbPlaces
 WHERE nbPlaces > 10
 RETURN person.name AS sickName, nbPlaces ORDER BY nbPlaces DESC
 
