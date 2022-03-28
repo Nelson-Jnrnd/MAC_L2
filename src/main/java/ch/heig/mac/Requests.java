@@ -65,9 +65,14 @@ public class Requests {
     }
 
     public List<Record> sociallyCareful() {
-        String query = "MATCH (person:Person {healthstatus:\"Sick\"})-[visit:VISITS]-(place:Place {type:\"Bar\"})\n" +
-                "WHERE all(_ in [person.confirmedtime, visit.starttime] WHERE visit.starttime < person.confirmedtime)\n" +
-                "RETURN DISTINCT(person.name) as sickName";
+        String query = "MATCH (sick:Person {healthstatus:\"Sick\"})-[visit:VISITS]-(:Place {type:\"Bar\"})\n" +
+                "WITH sick, collect(visit) AS visits \n" +
+                "WHERE all(visit in visits WHERE sick.confirmedtime > visit.endtime)\n" +
+                "RETURN sick.name AS sickName\n" +
+                "UNION ALL\n" +
+                "MATCH (sick2:Person {healthstatus:\"Sick\"})\n" +
+                "WHERE not exists((sick2)-[:VISITS]-(:Place {type:\"Bar\"}))\n" +
+                "RETURN sick2.name AS sickName";
 
         return fetchRecordsFromQuery(query);
     }

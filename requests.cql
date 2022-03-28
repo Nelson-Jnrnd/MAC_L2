@@ -15,9 +15,14 @@ WHERE nbPlaces > 10
 RETURN person.name AS sickName, nbPlaces ORDER BY nbPlaces DESC
 
 // Requête 4 - sociallyCareful
-MATCH (person:Person {healthstatus:"Sick"})-[visit:VISITS]-(place:Place {type:"Bar"})
-WHERE all(_ in [person.confirmedtime, visit.starttime] WHERE visit.starttime < person.confirmedtime)
-RETURN DISTINCT(person.name) AS sickName
+MATCH (sick:Person {healthstatus:"Sick"})-[visit:VISITS]-(:Place {type:"Bar"})
+WITH sick, collect(visit) AS visits 
+WHERE all(visit in visits WHERE sick.confirmedtime > visit.endtime)
+RETURN sick.name AS sickName
+UNION ALL
+MATCH (sick2:Person {healthstatus:"Sick"})
+WHERE not exists((sick2)-[:VISITS]-(:Place {type:"Bar"}))
+RETURN sick2.name AS sickName
 
 // Requête 5 - peopleToInform :::: Je sais pas si le distinct dans le collect est de trop. Mais mieux vaut trop que pas assez
 MATCH (sick:Person {healthstatus:"Sick"})-[v:VISITS]-(p:Place)-[v2:VISITS]-(potential:Person {healthstatus:"Healthy"})
