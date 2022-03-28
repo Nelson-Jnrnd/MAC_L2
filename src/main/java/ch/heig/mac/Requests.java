@@ -56,7 +56,8 @@ public class Requests {
     }
 
     public List<Record> carelessPeople() {
-        String query = "MATCH (person:Person {healthstatus:\"Sick\"})-[:VISITS]->(place:Place)\n" +
+        String query = "MATCH (person:Person {healthstatus:\"Sick\"})-[v:VISITS]->(place:Place)\n" +
+                "WHERE person.confirmedtime > v.starttime\n" +        
                 "WITH person, count(place.name) AS nbPlaces\n" +
                 "WHERE nbPlaces > 10\n" +
                 "RETURN person.name AS sickName, nbPlaces ORDER BY nbPlaces DESC";
